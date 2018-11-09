@@ -86,23 +86,254 @@ Write a secondary function that scrapes the lyrics for each song page.
 ```python
 #Remember to open up the webpage in a browser and control-click/right-click and go to inspect!
 from bs4 import BeautifulSoup
+from pprint import pprint
+
+
 import requests
 
 #Example page
-url = 'https://www.ebay.com/deals?'
+# url = 'https://www.ebay.com/deals?'
 
 
-html_page = requests.get(url) # requests.get() -> makes a requests then gets the page content of the url
-soup = BeautifulSoup(html_page.content, 'html.parser')
-soup.prettify()[:1000]
+# html_page = requests.get(url) # requests.get() -> makes a requests then gets the page content of the url
+# soup = BeautifulSoup(html_page.content, 'html.parser')
+# soup.prettify()[:1000]
+```
+
+# Scraping Steam
+
+
+```python
+url = "https://store.steampowered.com/explore/new/"
+source_page = requests.get(url)
+soup = BeautifulSoup(source_page.content, 'html.parser')
+soup.prettify()[:100]
 ```
 
 
 
 
-    '<!DOCTYPE doctype html>\n<html lang="en">\n <head>\n  <meta charset="utf-8"/>\n  <meta content="IE=Edge" http-equiv="X-UA-Compatible"/>\n  <meta content="width=device-width" name="viewport"/>\n  <meta content="34E98E6F27109BE1A9DCF19658EEEE33" name="msvalidate.01">\n   <meta content="6e11485a66d91eff" name="yandex-verification">\n    <link href="https://ir.ebaystatic.com" rel="preconnect"/>\n    <link href="https://i.ebayimg.com" rel="preconnect"/>\n    <meta content="acf32e2a69cbc2b0" name="y_key">\n     <title>\n      Daily Deals on eBay | Best deals and Free Shipping\n     </title>\n     <meta content="Save money on the best Deals online with eBay Deals. We update our deals daily, so check back for the best deals - Plus Free Shipping" name="description"/>\n     <meta content="8kHr3jd3Z43q1ovwo0KVgo_NZKIEMjthBxti8m8fYTg" name="google-site-verification"/>\n     <link href="https://www.ebay.com/deals" rel="canonical"/>\n     <meta content="unsafe-url" name="referrer"/>\n     <meta content="1026282131252'
+    '<!DOCTYPE html>\n<html class=" responsive" lang="en">\n <head>\n  <meta content="text/html; charset=utf'
 
 
+
+
+```python
+game_names = soup.find_all("div", class_="tab_item_name")
+```
+
+
+```python
+actual_game_names = []
+for game in game_names:
+    name = game.text
+    actual_game_names.append(name)
+actual_game_names[:10]
+```
+
+
+
+
+    ['Thief Simulator',
+     "Don't Starve: Hamlet",
+     'Total War: WARHAMMER II - Curse of the Vampire Coast',
+     'TSIOQUE',
+     "Leisure Suit Larry - Wet Dreams Don't Dry",
+     'ARK: Extinction - Expansion Pack',
+     'The Shapeshifting Detective',
+     "OVERKILL's The Walking Dead",
+     'GRIP: Combat Racing',
+     'Football Manager 2019']
+
+
+
+
+```python
+final_prices = soup.find_all("div", class_="discount_final_price")
+```
+
+
+```python
+actual_final_prices=[]
+for price in final_prices:
+    price = price.text.replace("$", "")
+    try:
+        price = float(price)
+        actual_final_prices.append(price)
+    except ValueError as e:
+        print("Game had a weird price {} that raised {}".format(price, e))
+        actual_final_prices.append(0.0)
+actual_final_prices
+```
+
+    Game had a weird price Free To Play that raised could not convert string to float: 'Free To Play'
+    Game had a weird price Free that raised could not convert string to float: 'Free'
+    Game had a weird price Free To Play that raised could not convert string to float: 'Free To Play'
+    Game had a weird price Free to Play that raised could not convert string to float: 'Free to Play'
+    Game had a weird price Free To Play that raised could not convert string to float: 'Free To Play'
+    Game had a weird price Free To Play that raised could not convert string to float: 'Free To Play'
+    Game had a weird price Free that raised could not convert string to float: 'Free'
+    Game had a weird price Free to Play that raised could not convert string to float: 'Free to Play'
+    Game had a weird price Free To Play that raised could not convert string to float: 'Free To Play'
+    Game had a weird price Free To Play that raised could not convert string to float: 'Free To Play'
+    Game had a weird price Free that raised could not convert string to float: 'Free'
+    Game had a weird price Free that raised could not convert string to float: 'Free'
+    Game had a weird price Free that raised could not convert string to float: 'Free'
+    Game had a weird price Free that raised could not convert string to float: 'Free'
+
+
+
+
+
+    [44.99,
+     49.99,
+     16.99,
+     59.99,
+     9.99,
+     34.99,
+     49.99,
+     12.74,
+     59.99,
+     44.99,
+     14.99,
+     28.0,
+     16.99,
+     6.99,
+     18.99,
+     13.99,
+     29.99,
+     19.99,
+     10.39,
+     59.99,
+     26.99,
+     49.99,
+     0.0,
+     0.0,
+     24.99,
+     44.99,
+     0.0,
+     59.99,
+     19.99,
+     11.99,
+     0.0,
+     39.99,
+     59.99,
+     19.99,
+     34.99,
+     29.99,
+     39.99,
+     19.99,
+     59.99,
+     0.0,
+     14.99,
+     59.99,
+     19.99,
+     14.99,
+     0.0,
+     59.99,
+     34.99,
+     0.0,
+     0.59,
+     2.39,
+     4.24,
+     0.59,
+     9.99,
+     4.79,
+     1.99,
+     0.0,
+     5.99,
+     16.99,
+     5.09,
+     4.49,
+     2.69,
+     5.99,
+     7.99,
+     14.99,
+     3.99,
+     0.0,
+     0.0,
+     1.43,
+     4.49,
+     4.99,
+     0.0,
+     0.0,
+     0.0,
+     0.59,
+     3.59,
+     0.0,
+     4.89,
+     9.99,
+     7.19,
+     7.19,
+     5.09,
+     5.09,
+     8.49,
+     8.49,
+     9.99,
+     9.99,
+     7.99,
+     7.99,
+     5.99,
+     5.99,
+     9.99,
+     8.99,
+     8.99,
+     9.99,
+     6.79,
+     6.79,
+     4.79,
+     4.79,
+     3.89,
+     3.89,
+     4.49,
+     4.49,
+     2.99,
+     0.59,
+     0.59,
+     2.09,
+     2.09,
+     4.99,
+     2.79,
+     2.79,
+     3.99,
+     3.99,
+     1.99,
+     3.99,
+     4.89,
+     4.89]
+
+
+
+
+```python
+game_urls_info = soup.find_all("a")
+```
+
+
+```python
+game_urls_list = [game_url.attrs["href"] for game_url in game_urls_info] # .attrs
+```
+
+
+```python
+game_urls_list[:5]
+```
+
+
+
+
+    ['https://store.steampowered.com/login/?redir=explore%2Fnew%2F&redir_ssl=1',
+     'https://store.steampowered.com/',
+     'https://store.steampowered.com/',
+     'https://store.steampowered.com/explore/',
+     'https://store.steampowered.com/curators/']
+
+
+
+
+```python
+soup.find_all("span", class_="game_review_summary positive")
+```
 
 
 ```python
